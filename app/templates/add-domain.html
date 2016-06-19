@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action="" method="POST" name="login">
+{{ form.hidden_tag() }}
+  <p>
+    Enter the Domain Name:<br>
+    {{ form.domain_name() }}<br>
+  </p>
+  {% if form.domain_name.errors %}
+      <ul class="errors">{% for error in form.domain_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p>
+  {{ form.purchase() }} Purchase domain
+  {% if form.purchase.errors %}
+      <ul class="errors">{% for error in form.purchase.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+  </p>
+
+  <p>
+  {{ form.purchase_privacy() }} Purchase privacy
+  {% if form.purchase_privacy.errors %}
+      <ul class="errors">{% for error in form.purchase_privacy.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+  </p>
+
+  <p>
+    Select the folder: {{ form.folder_name() }}
+  </p>
+  {% if form.folder_name.errors %}
+      <ul class="errors">{% for error in form.folder_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p>
+    Select the customer: {{ form.parker_name() }}
+  </p>
+  {% if form.parker_name.errors %}
+      <ul class="errors">{% for error in form.parker_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p>
+    Select the contact: {{ form.contact() }}
+  </p>
+  {% if form.contact.errors %}
+      <ul class="errors">{% for error in form.contact.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p><input type="submit" name="Sign In"></p>
+</form>
+
+{% endblock %}

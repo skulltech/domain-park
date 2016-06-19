@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>DomainPark {{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  </head>
+  
+  <body>
+
+    <nav class="navbar" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">DomainPark</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar">
+          <ul class="nav navbar-nav">
+            <li><a href="/add-domain">Add domain</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Domains <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/show-folders">Show Domains</a></li>
+                <li><a href="/add-folder">Add Domain</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Folders <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/show-folders">Show Folders</a></li>
+                <li><a href="/add-folder">Add Folder</a></li>
+                <li><a href="/edit-folder">Edit Folder</a></li>
+                <li><a href="/delete-folder">Delete Folder</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/edit-credentials">Edit Credentials</a></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if category == "success" %}
+              <div class="alert alert-success fade in"><strong>Success!</strong>
+            {% elif category == "info" %}
+              <div class="alert alert-info fade in"><strong>Info!</strong>
+            {% elif category == "warning" %}
+              <div class="alert alert-warning fade in"><strong>Warning!</strong>
+            {% elif category == "error" %}
+              <div class="alert alert-danger fade in"><strong>Error!</strong>
+            {% endif %}
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            {{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="container">
+      <h2>{{ title }}</h2>
+      <br>
+      {% block content %}{% endblock %}
+      <br>
+    </div>
+
+  </body>
+</html>

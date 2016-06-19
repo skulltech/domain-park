@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+{% if error %}<p class="errors"><strong>Error: </strong>{{ error }}{% endif %}</p>
+
+<form method="post" name="add_folder", class='pure-form pure-form-stacked'>
+	{{ form.hidden_tag() }}
+	<p>
+	  Enter Folder's Name:<br>
+	  {{ form.folder_name() }}<br>
+	</p>
+	{% if form.folder_name.errors %}
+	    <ul class="errors">{% for error in form.folder_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+	{% endif %}
+
+	<p>
+	  Enter the Keywords, seperated by Newline:<br>
+	  {{ form.keywords() }}
+	</p>
+	{% if form.keywords.errors %}
+	    <ul class="errors">{% for error in form.keywords.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+	{% endif %}
+
+	<p><input type="submit" name="Add Folder"></p>
+</form>
+{% endblock %}

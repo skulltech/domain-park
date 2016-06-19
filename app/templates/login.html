@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+{% if error %}
+<p class="errors"><strong>Error: </strong>{{ error }}</p>
+{% endif %}
+
+<form action="" method="post" name="login">
+{{ form.hidden_tag() }}
+  <p>
+    Enter your Username:<br>
+    {{ form.username() }}<br>
+  </p>
+  {% if form.username.errors %}
+      <ul class="errors">{% for error in form.username.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p>
+    Enter your Password:<br>
+    {{ form.password() }}
+  </p>
+  {% if form.password.errors %}
+      <ul class="errors">{% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p>{{ form.remember_me }} Remember Me</p>
+  {% if form.remember_me.errors %}
+      <ul class="errors">{% for error in form.remember_me.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p><input type="submit" name="Sign In"></p>
+</form>
+
+{% endblock %}

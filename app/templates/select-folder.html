@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+<p class='errors'><strong>Error: </strong> {{error}} </p>
+{% endif %}
+
+<form method="post" name="delete-folder", class='pure-form pure-form-stacked'>
+	{{ form.hidden_tag() }}
+
+	<p>Select the Folder's name
+	<br>	
+	{{ form.folder_name() }}
+	{% if form.folder_name.errors %}
+	    <ul class="errors">{% for error in form.folder_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+	{% endif %}
+	</p>
+
+	<p><input type="submit" name="Delete Folder"></p>
+</form>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+<p class='errors'><strong>Error: </strong> {{error}} </p>
+{% endif %}
+
+<table class='table'>
+<thead>
+	<tr>
+		<th>Name</th>
+		<th>Keywords</th>
+	</tr>
+</thead>
+
+<tbody>
+{% for folder in folders %}
+
+<tr>
+	<td>{{ folder.folder }}</td>
+	<td>{{ folder.keywords }}</td>
+</tr>
+
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
