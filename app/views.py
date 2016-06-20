@@ -1,6 +1,6 @@
 from flask import render_template, request, url_for, flash, session, redirect, abort
 from app import app, db, models
-from .forms import LoginForm, AddFolderForm, AddDomainForm, SelectFolderForm, EditCredentialsForm
+from .forms import LoginForm, AddFolderForm, AddDomainForm, SelectFolderForm, ParkingcrewCredsForm, AlpnamesCredsForm, RookmediaCredsForm, SelectAccountForm
 from .core import AlpNames, RookMedia, ParkingCrew
 import json
 
@@ -126,38 +126,71 @@ def edit_credentials():
     if not session.get('logged_in'):
         return redirect('/login')
 
+    account_type = request.args.get('account')
+    account_name = request.args.get('name')
+
+    if not (account_type and account_name):
+        form = SelectAccountForm()
+
+        with open('credentials.json', mode='r') as f:
+            creds = json.load(f)
+
+        choices = []
+        for key in creds['parkingcrew']:
+            choices.append(('pc' + key, 'Parkingcrew : ' + key))
+        for key, value in creds['alpnames'].items():
+            choices.append(('an' + key, 'Alpnames : ' + key))
+        for key, value in creds['rookmedia'].items():
+            choices.append(('rm' + key, 'Rookmedia : ' + key))
+
+        form.account_name.choices = choices
+
+        if request.method == 'POST' and form.validate():
+            account = form.account_name.data[:2]
+            name = form.account_name.data[2:]
+            return redirect(url_for('edit_credentials', account=account, name=name))
+
+        return render_template('select-account.html', title='Select Account', form=form)
+
     with open('credentials.json', mode='r') as f:
-        credentials = json.load(f)
+        creds = json.load(f)
 
-    form = EditCredentialsForm(username = credentials['master']['username'],
-        password = credentials['master']['password'],
-        alpnames_reseller_id = credentials['alpnames']['reseller_id'], 
-        alpnames_api_key = credentials['alpnames']['api_key'], 
-        alpnames_customer_id = credentials['alpnames']['customer_id'], 
-        parkingcrew_username_1 = credentials['parkingcrew']['1']['username'], 
-        parkingcrew_api_key_1 = credentials['parkingcrew']['1']['api_key'],
-        parkingcrew_username_2 = credentials['parkingcrew']['2']['username'], 
-        parkingcrew_api_key_2 = credentials['parkingcrew']['2']['api_key'])
-    error = None
+    if account_type == 'pc':
+        form = ParkingcrewCredsForm(account_name=account_name, username=creds['parkingcrew'][account_name]['username'], api_key=creds['parkingcrew'][account_name]['api_key'])
+        if request.method == 'POST' and form.validate():
+            del creds['parkingcrew'][account_name]
+            creds['parkingcrew'][form.account_name.data] = {'username': form.username.data, 'api_key':form.api_key.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully edited'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('parkingcrew-credentials.html', title='Edit Parkingcrew Account', form=form)
 
-    if request.method == 'POST' and form.validate():
-        credentials['alpnames']['reseller_id'] = form.alpnames_reseller_id.data
-        credentials['alpnames']['api_key'] = form.alpnames_api_key.data
-        credentials['alpnames']['customer_id'] = form.alpnames_customer_id.data
-        credentials['parkingcrew']['1']['username'] = form.parkingcrew_username_1.data
-        credentials['parkingcrew']['1']['api_key'] = form.parkingcrew_api_key_1.data
-        credentials['parkingcrew']['2']['username'] = form.parkingcrew_username_2.data
-        credentials['parkingcrew']['2']['api_key'] = form.parkingcrew_api_key_2.data
-        credentials['master']['username'] = form.username.data
-        credentials['master']['password'] = form.password.data
+    elif account_type == 'rm':
+        form = RookmediaCredsForm(account_name=account_name, guid=creds['rookmedia'][account_name]['guid'])
+        if request.method == 'POST' and form.validate():
+            del creds['rookmedia'][account_name]
+            creds['rookmedia'][form.account_name.data] = {'guid': form.guid.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully edited'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('rookmedia-credentials.html', title='Edit Rookmedia Account', form=form)
+    
+    elif account_type == 'an':
+        form = AlpnamesCredsForm(account_name=account_name, reseller_id=creds['alpnames'][account_name]['reseller_id'], api_key=creds['alpnames'][account_name]['api_key'], customer_id=creds['alpnames'][account_name]['customer_id'])
+        if request.method == 'POST' and form.validate():
+            del creds['alpnames'][account_name]
+            creds['alpnames'][form.account_name.data] = {'reseller_id': form.reseller_id.data, 'api_key':form.api_key.data, 'customer_id':form.customer_id.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully edited'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('alpnames-credentials.html', title='Edit Alpnames Account', form=form)
 
-        with open('credentials.json', mode='w') as f:
-            json.dump(credentials, f)
-
-        flash('The credentials are successfully edited', 'success')
+    else:
+        flash('Invalid account type', 'error')
         return redirect('/home')
-
-    return render_template('edit-credentials.html', title='Edit Credentials', form=form, error=error)
 
 @app.route('/add-domain', methods=['GET', 'POST'])
 def add_domain():

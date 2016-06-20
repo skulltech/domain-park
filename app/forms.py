@@ -27,23 +27,12 @@ class SelectFolderForm(Form):
 class SelectAccountForm(Form):
 	account_name = SelectField('Account Name')
 
-class EditCredentialsForm(Form):
-	username = StringField('Master Username', validators=[DataRequired()])
-	password = StringField('Master Password', validators=[DataRequired()])
-	alpnames_reseller_id = IntegerField('AlpNames Reseller ID', validators=[DataRequired()])
-	alpnames_api_key = StringField('AlpNames API Key', validators=[DataRequired()])
-	alpnames_customer_id = IntegerField('AlpNames Customer ID', validators=[DataRequired()])
-	parkingcrew_username_1 = StringField('ParkingCrew Username', validators=[DataRequired()])
-	parkingcrew_api_key_1 = StringField('ParkingCrew API Key', validators=[DataRequired()])
-	parkingcrew_username_2 = StringField('ParkingCrew Username', validators=[DataRequired()])
-	parkingcrew_api_key_2 = StringField('ParkingCrew API Key', validators=[DataRequired()])
-
 class ParkingcrewCredsForm(Form):
 	account_name = StringField('Parkingcrew Account Name', validators=[DataRequired()])
 	username = StringField('Parkingcrew Username', validators=[DataRequired()])
 	api_key = StringField('ParkingCrew API Key', validators=[DataRequired()])
 
-class AlpnamesCredForm(Form):
+class AlpnamesCredsForm(Form):
 	account_name = StringField('Alpnames Account Name', validators=[DataRequired()])
 	reseller_id = IntegerField('AlpNames Reseller ID', validators=[DataRequired()])
 	api_key = StringField('AlpNames API Key', validators=[DataRequired()])

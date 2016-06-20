@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form action="" method="POST" name="Rookmedia Credentials">
+<form action="" method="POST" name="Select Account">
 {{ form.hidden_tag() }}
 
   <p>
@@ -12,15 +12,7 @@
       <ul class="errors">{% for error in form.account_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
   {% endif %}
 
-  <p>
-    GUID:<br>
-    {{ form.guid() }}<br>
-  </p>
-  {% if form.guid.errors %}
-      <ul class="errors">{% for error in form.guid.errors %}<li>{{ error }}</li>{% endfor %}</ul>
-  {% endif %}
-
-  <p><input type="submit" name="Submit Rookmedia Credentials"></p>
+  <p><input type="submit" name="Select Account"></p>
 </form>
 
 {% endblock %}
