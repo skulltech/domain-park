@@ -1,7 +1,7 @@
 from flask import render_template, request, url_for, flash, session, redirect, abort
 from app import app, db, models
-from .forms import LoginForm, AddFolderForm, AddDomainForm, SelectFolderForm, ParkingcrewCredsForm, AlpnamesCredsForm, RookmediaCredsForm, SelectAccountForm
-from .core import AlpNames, RookMedia, ParkingCrew
+import forms
+import core
 import json
 
 
@@ -26,7 +26,7 @@ def delete_folder():
     if not session.get('logged_in'):
         return redirect('/login')
 
-    form = SelectFolderForm()
+    form = forms.SelectFolderForm()
 
     entries = models.Folders.query.all()
     form.folder_name.choices = [(e.id, e.folder) for e in entries]
@@ -43,7 +43,7 @@ def delete_folder():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
+    form = forms.LoginForm()
     error = None
 
     with open('credentials.json') as f:
@@ -73,7 +73,7 @@ def add_folder():
     if not session.get('logged_in'):
         return redirect('/login')
 
-    form = AddFolderForm()
+    form = forms.AddFolderForm()
     error = None
 
     if request.method == 'POST' and form.validate():
@@ -95,7 +95,7 @@ def edit_folder():
 
     folder_id = request.args.get('folderID')
     if not folder_id:
-        form =SelectFolderForm()
+        form = forms.SelectFolderForm()
 
         entries = models.Folders.query.all()
         form.folder_name.choices = [(e.id, e.folder) for e in entries]
@@ -130,7 +130,7 @@ def edit_credentials():
     account_name = request.args.get('name')
 
     if not (account_type and account_name):
-        form = SelectAccountForm()
+        form = forms.SelectAccountForm()
 
         with open('credentials.json', mode='r') as f:
             creds = json.load(f)
@@ -156,7 +156,7 @@ def edit_credentials():
         creds = json.load(f)
 
     if account_type == 'pc':
-        form = ParkingcrewCredsForm(account_name=account_name, username=creds['parkingcrew'][account_name]['username'], api_key=creds['parkingcrew'][account_name]['api_key'])
+        form = forms.ParkingcrewCredsForm(account_name=account_name, username=creds['parkingcrew'][account_name]['username'], api_key=creds['parkingcrew'][account_name]['api_key'])
         if request.method == 'POST' and form.validate():
             del creds['parkingcrew'][account_name]
             creds['parkingcrew'][form.account_name.data] = {'username': form.username.data, 'api_key':form.api_key.data}
@@ -167,7 +167,7 @@ def edit_credentials():
         return render_template('parkingcrew-credentials.html', title='Edit Parkingcrew Account', form=form)
 
     elif account_type == 'rm':
-        form = RookmediaCredsForm(account_name=account_name, guid=creds['rookmedia'][account_name]['guid'])
+        form = forms.RookmediaCredsForm(account_name=account_name, guid=creds['rookmedia'][account_name]['guid'])
         if request.method == 'POST' and form.validate():
             del creds['rookmedia'][account_name]
             creds['rookmedia'][form.account_name.data] = {'guid': form.guid.data}
@@ -178,7 +178,7 @@ def edit_credentials():
         return render_template('rookmedia-credentials.html', title='Edit Rookmedia Account', form=form)
     
     elif account_type == 'an':
-        form = AlpnamesCredsForm(account_name=account_name, reseller_id=creds['alpnames'][account_name]['reseller_id'], api_key=creds['alpnames'][account_name]['api_key'], customer_id=creds['alpnames'][account_name]['customer_id'])
+        form = forms.AlpnamesCredsForm(account_name=account_name, reseller_id=creds['alpnames'][account_name]['reseller_id'], api_key=creds['alpnames'][account_name]['api_key'], customer_id=creds['alpnames'][account_name]['customer_id'])
         if request.method == 'POST' and form.validate():
             del creds['alpnames'][account_name]
             creds['alpnames'][form.account_name.data] = {'reseller_id': form.reseller_id.data, 'api_key':form.api_key.data, 'customer_id':form.customer_id.data}
@@ -197,8 +197,8 @@ def add_domain():
     if not session.get('logged_in'):
         return redirect('/login')
 
-    alpnames = AlpNames()
-    form = AddDomainForm()
+    alpnames = core.AlpNames()
+    form = forms.AddDomainForm()
     error = None
 
     form.folder_name.choices = [(e.id, e.folder)
@@ -234,9 +234,9 @@ def add_domain():
 
         if form.parker_name.data == 'pk1' or form.parker_name.data == 'pk2':
             if form.parker_name.data == 'pk1':
-                parkingcrew = ParkingCrew('1')
+                parkingcrew = core.ParkingCrew('1')
             else:
-                parkingcrew = ParkingCrew('2')
+                parkingcrew = core.ParkingCrew('2')
             folder_name = models.Folders.query.get(form.folder_name.data).folder
             folder_id = parkingcrew.get_folder_id(folder_name=folder_name)
 
