@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form method="post" name="select-company">
+	{{ form.hidden_tag() }}
+
+	<p>Select the Domain Parker's name
+	<br>	
+	{{ form.company_name() }}
+	{% if form.company_name.errors %}
+	    <ul class="errors">{% for error in form.company_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+	{% endif %}
+	</p>
+
+	<p><input type="submit" name="Select Company"></p>
+</form>
+
+{% endblock %}

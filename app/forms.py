@@ -10,14 +10,13 @@ class LoginForm(Form):
 class AddFolderForm(Form):
 	folder_name = StringField('Folder Name', validators=[DataRequired()])
 	keywords = TextAreaField('Keywords', validators=[DataRequired()])
-	# folio_id = StringField('RookMedia Folio ID')
 
 class AddDomainForm(Form):
 	domain_name = StringField('Domain Name', validators=[DataRequired()])
 	purchase = BooleanField('Purchase Domain', default='checked')
 	purchase_privacy = BooleanField('Purchase Privacy', default='checked')
 	folder_name = SelectField('Folder Name', coerce=int)
-	parker_name = RadioField("Domain Parker's name", validators=[DataRequired()],
+	parker_name = RadioField('Domain Parker\'s name', validators=[DataRequired()],
 		choices = [('pk1', 'Parking Crew (SunDial)'), ('pk2', 'Parking Crew (VolumeDirect)'), ('rm', 'Rook Media')])
 	contact = SelectField('Contact Name')
 
@@ -41,3 +40,6 @@ class AlpnamesCredsForm(Form):
 class RookmediaCredsForm(Form):
 	account_name = StringField('Rookmedia Account Name', validators=[DataRequired()])
 	guid = StringField('Rookmedia GUID', validators=[DataRequired()])
+
+class SelectCompanyForm(Form):
+	company_name = RadioField('Company name', validators=[DataRequired()], choices = [('pc', 'Parking Crew'), ('rm', 'Rook Media'), ('an', 'Alpnames')])

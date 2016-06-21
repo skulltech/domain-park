@@ -1,7 +1,7 @@
 from flask import render_template, request, url_for, flash, session, redirect, abort
 from app import app, db, models
-import forms
-import core
+import app.forms as forms
+import app.core as core
 import json
 
 
@@ -40,6 +40,61 @@ def delete_folder():
         return redirect('/home')
 
     return render_template('select-folder.html', title='Delete Folder', form=form)
+
+@app.route('/add-account', methods=['POST', 'GET'])
+def add_account():
+    if not session.get('logged_in'):
+        return redirect('/login')
+
+    account_type = request.args.get('account')
+
+    if not account_type:
+        form = forms.SelectCompanyForm()
+
+        if request.method == 'POST' and form.validate():
+            return redirect(url_for('add_account', account=form.company_name.data))
+
+        return render_template('select-company.html', title='Select Company', form=form)
+
+    with open('credentials.json', mode='r') as f:
+        creds = json.load(f)
+
+    if account_type == 'pc':
+        form = forms.ParkingcrewCredsForm()
+        if request.method == 'POST' and form.validate():
+            creds['parkingcrew'].pop(form.account_name.data, None)
+            creds['parkingcrew'][form.account_name.data] = {'username': form.username.data, 'api_key':form.api_key.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully added'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('parkingcrew-credentials.html', title='Add Parkingcrew Account', form=form)
+
+    elif account_type == 'rm':
+        form = forms.RookmediaCredsForm()
+        if request.method == 'POST' and form.validate():
+            creds['rookmedia'].pop(form.account_name.data, None)
+            creds['rookmedia'][form.account_name.data] = {'guid': form.guid.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully added'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('rookmedia-credentials.html', title='Add Rookmedia Account', form=form)
+    
+    elif account_type == 'an':
+        form = forms.AlpnamesCredsForm()
+        if request.method == 'POST' and form.validate():
+            creds['alpnames'].pop(form.account_name.data)
+            creds['alpnames'][form.account_name.data] = {'reseller_id': form.reseller_id.data, 'api_key':form.api_key.data, 'customer_id':form.customer_id.data}
+            with open('credentials.json', mode='w') as f:
+                json.dump(creds, f)
+            flash('The account {} is successfully added'.format(form.account_name.data), 'success')
+            return redirect('/home')
+        return render_template('alpnames-credentials.html', title='Add Alpnames Account', form=form)
+
+    else:
+        flash('Invalid company', 'error')
+        return redirect('/home')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -191,6 +246,46 @@ def edit_credentials():
     else:
         flash('Invalid account type', 'error')
         return redirect('/home')
+
+@app.route('/delete-account', methods=['GET', 'POST'])
+def delete_account():
+    if not session.get('logged_in'):
+        return redirect('/login')
+
+    form = forms.SelectAccountForm()
+
+    with open('credentials.json', mode='r') as f:
+        creds = json.load(f)
+
+    choices = []
+    for key in creds['parkingcrew']:
+        choices.append(('pc' + key, 'Parkingcrew : ' + key))
+    for key, value in creds['alpnames'].items():
+        choices.append(('an' + key, 'Alpnames : ' + key))
+    for key, value in creds['rookmedia'].items():
+        choices.append(('rm' + key, 'Rookmedia : ' + key))
+
+    form.account_name.choices = choices
+
+    if request.method == 'POST' and form.validate():
+        account = form.account_name.data[:2]
+        name = form.account_name.data[2:]
+        
+        if account == 'pc': account = 'parkingcrew'
+        elif account == 'rm': account = 'rookmedia'
+        elif account == 'an': account = 'alpnames'
+        else:
+            flash('Invalid Company', 'error')
+            return('/home')
+
+        del creds[account][name]
+        with open('credentials.json', mode='w') as f:
+            json.dump(creds, f)
+
+        flash('The account {} is deleted'.format(name), 'success')
+        return('/home') 
+
+    return render_template('select-account.html', title='Select Account', form=form)
 
 @app.route('/add-domain', methods=['GET', 'POST'])
 def add_domain():
