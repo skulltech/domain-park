@@ -8,12 +8,16 @@ class APIException(Exception):
 
 
 class AlpNames:
-	def __init__(self):
+	def __init__(self, account_name):
 		with open('credentials.json') as f:
-			credentials = json.load(f)
-		self.reseller_id = credentials['alpnames']['reseller_id']
-		self.api_key = credentials['alpnames']['api_key']
-		self.customer_id = credentials['alpnames']['customer_id']
+			creds = json.load(f)
+
+		try:
+			self.reseller_id = creds['alpnames'][account_name]['reseller_id']
+			self.api_key = credentials['alpnames'][account_name]['api_key']
+			self.customer_id = credentials['alpnames'][account_name]['customer_id']
+		except KeyError:
+			raise APIException
 
 	def register_domain(self, domain_name, nameservers, privacy, contact_id):
 		if privacy:
@@ -124,8 +128,14 @@ class AlpNames:
 
 
 class RookMedia:
-	def __init__(self):
-		self.guid = 'B210F61C-E9F4-4FFB-919E-BE1D2FCD91F6'
+	def __init__(self, account_name):
+		with open('credentials.json') as f:
+			creds = json.load(f)
+
+		try:
+			self.guid = creds['rookmedia'][account_name]['guid']
+		except KeyError:
+			raise APIException
 
 	def list_domains(self):
 		payload = {
@@ -181,11 +191,15 @@ class RookMedia:
 
 
 class ParkingCrew:
-	def __init__(self, account_no):
+	def __init__(self, account_name):
 		with open('credentials.json') as f:
-			credentials = json.load(f)
-		self.user_name = credentials['parkingcrew'][account_no]['username']
-		self.api_key = credentials['parkingcrew'][account_no]['api_key']
+			creds = json.load(f)
+
+		try:
+			self.user_name = creds['parkingcrew'][account_name]['username']
+			self.api_key = creds['parkingcrew'][account_name]['api_key']
+		except KeyError:
+			raise APIException
 
 	def add_folder(self, folder_name):
 		payload = {
