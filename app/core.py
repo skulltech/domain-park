@@ -2,6 +2,8 @@ import requests
 import xmltodict
 import json
 from datetime import date, timedelta
+from xml.parsers.expat import ExpatError
+
 
 class APIException(Exception):
 	pass
@@ -187,6 +189,30 @@ class ParkingCrew:
 		self.user_name = credentials['parkingcrew'][account_no]['username']
 		self.api_key = credentials['parkingcrew'][account_no]['api_key']
 
+	def get_domain_stats(self, date_from, date_to, domain_name):
+		payload = {
+		'user_name': self.user_name,
+		'api_key': self.api_key,
+		'day': date_from,
+		'to': date_to,
+		'csv': 1,
+		'mode': 'date',
+		'fields': 'cpc,revenue',
+		'domain': domain_name}
+
+		response = requests.get('https://api.parkingcrew.com/stats_v3.php', params=payload)
+
+		try:
+			response_dict = xmltodict.parse(response.text)
+		except ExpatError:
+			raise APIException()
+
+		stats = '/n'.join(response.text.splitlines(True)[3:])
+		return stats
+
+	def get_folder_stats(self, folder_id, date_from, date_to):
+		pass
+		
 	def add_folder(self, folder_name):
 		payload = {
 		'user_name': self.user_name,
